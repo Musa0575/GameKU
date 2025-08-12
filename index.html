@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Game Edukasi Guru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fallback CSS for offline use -->
+    <style>
+        /* Tailwind CSS fallback styles for offline use */
+        .container { max-width: 1200px; margin: 0 auto; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .text-center { text-align: center; }
+        .text-white { color: white; }
+        .bg-white { background-color: white; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .p-6 { padding: 1.5rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .font-bold { font-weight: 700; }
+        .text-2xl { font-size: 1.5rem; }
+        .grid { display: grid; }
+        .gap-4 { gap: 1rem; }
+        .border { border: 1px solid #d1d5db; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .bg-purple-500 { background-color: #8b5cf6; }
+        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
+        .text-lg { font-size: 1.125rem; }
+        .hidden { display: none; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .bg-black { background-color: black; }
+        .bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .z-50 { z-index: 50; }
+        .max-w-md { max-width: 28rem; }
+        .w-full { width: 100%; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-all { transition: all 0.3s ease; }
+        .transform { transform: translateZ(0); }
+        .hover\:scale-105:hover { transform: scale(1.05); }
+    </style>
+    <style>
+        .crossword-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-weight: bold;
+        }
+        .word-search-cell {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .word-search-cell.found {
+            background-color: #fbbf24;
+        }
+        .puzzle-piece {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            user-select: none;
+        }
+        .puzzle-slot {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed #9ca3af;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .puzzle-slot.filled {
+            border-style: solid;
+            border-color: #10b981;
+        }
+        
+        /* Matching Game Styles */
+        .matching-item {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+        }
+        
+        .matching-item:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .matching-item.selected {
+            border-color: #10b981;
+            background: #dcfce7;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        .matching-item.matched {
+            border-color: #059669;
+            background: #d1fae5;
+            opacity: 0.8;
+            cursor: default;
+        }
+        
+        .matching-item.wrong {
+            border-color: #dc2626;
+            background: #fecaca;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .matching-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 2px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Word Scramble Styles */
+        .scramble-letter {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            user-select: none;
+        }
+        
+        .scramble-letter:hover {
+            border-color: #7c3aed;
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scramble-letter.selected {
+            border-color: #7c3aed;
+            background: #ede9fe;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+        
+        .answer-slot {
+            width: 50px;
+            height: 50px;
+            border: 2px dashed #9ca3af;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-slot.filled {
+            border-style: solid;
+            border-color: #10b981;
+            background: #dcfce7;
+            color: #065f46;
+        }
+        
+        .answer-slot.correct {
+            border-color: #059669;
+            background: #d1fae5;
+            animation: bounce 0.6s ease;
+        }
+        
+        .answer-slot.wrong {
+            border-color: #dc2626;
+            background: #fecaca;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+        
+        /* Enhanced Styling */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Untuk menggunakan gambar background, ganti dengan: */
+            /* background-image: url('path/ke/gambar-anda.jpg'); */
+            /* background-size: cover; */
+            /* background-position: center; */
+            /* background-repeat: no-repeat; */
+            /* background-attachment: fixed; */
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .floating-card {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .floating-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .calendar-day {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e0e7ff;
+            transform: scale(1.1);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .calendar-day.other-month {
+            color: #9ca3af;
+        }
+        
+        .time-display {
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .game-card {
+            background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .sparkle {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sparkle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: sparkle 3s infinite;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen relative overflow-x-hidden">
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white opacity-5 rounded-full blur-2xl pulse-animation"></div>
+    </div>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Login Modal -->
+        <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl max-w-4xl w-full mx-4 overflow-hidden shadow-2xl">
+                <div class="flex min-h-[500px]">
+                    <!-- Left Section - Logo & Welcome -->
+                    <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 p-8 flex flex-col justify-center items-center text-white relative overflow-hidden w-1/2">
+                        <!-- Background decoration -->
+                        <div class="absolute inset-0 opacity-10">
+                            <div class="absolute top-10 left-10 w-20 h-20 bg-white rounded-full"></div>
+                            <div class="absolute bottom-20 right-10 w-16 h-16 bg-white rounded-full"></div>
+                            <div class="absolute top-1/2 left-5 w-12 h-12 bg-white rounded-full"></div>
+                        </div>
+                        
+                        <!-- Logo placeholder -->
+                        <div class="relative z-10 text-center">
+                            <div ">
+                                <!-- Ganti dengan logo lembaga Anda -->
+                                <div ">
+                                    <span class="text-3xl"><img src="logo3.png"></span>
+                                </div>
+                            </div>
+                            
+                            <h1 class="text-3xl font-bold mb-3">Selamat Datang</h1>
+                            <h2 class="text-xl mb-6 opacity-90">Platform Game Edukasi</h2>
+                            
+                            <!-- Nama lembaga - ganti sesuai kebutuhan -->
+                            <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
+                                <h3 class="text-lg font-bold">SMA AL MUSLIM TAMBUN</h3>
+                                <p class="text-base opacity-90">Belajar Sambil Bermain</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Section - Login Options -->
+                    <div class="p-8 flex flex-col justify-center w-1/2">
+                        <div class="w-full">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-3 text-center">Pilih Peran Anda</h2>
+                            <p class="text-gray-600 text-center mb-8 text-base">Silakan pilih sebagai guru atau siswa untuk melanjutkan</p>
+                            
+                            <div class="space-y-4">
+                                <button onclick="showTeacherLogin()" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-purple-800 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-center space-x-3">
+                                        <span class="text-2xl">👨‍🏫</span>
+                                        <span>Masuk sebagai Guru</span>
+                                    </div>
+                                    <p class="text-sm opacity-90 mt-2">Buat dan kelola game edukatif</p>
+                                </button>
+                                
+                                <button onclick="showStudentLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-4 rounded-xl text-lg font-bold hover:from-indigo-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-center space-x-3">
+                                        <span class="text-2xl">👨‍🎓</span>
+                                        <span>Masuk sebagai Siswa</span>
+                                    </div>
+                                    <p class="text-sm opacity-90 mt-2">Bergabung dan mainkan game</p>
+                                </button>
+                            </div>
+                            
+                            <div class="mt-8 text-center">
+                                <p class="text-sm text-gray-500">
+                                    💡 <strong>Tips:</strong> Guru membuat game dan memberikan PIN kepada siswa
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Login Modal -->
+        <div id="teacher-login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold text-center mb-6">👨‍🏫 Login Guru</h2>
+                <div class="space-y-4">
+                    <input type="text" id="teacher-name" placeholder="Nama guru" class="w-full border rounded-lg px-4 py-3 text-lg">
+                    <input type="text" id="teacher-subject" placeholder="Mata pelajaran" class="w-full border rounded-lg px-4 py-3 text-lg">
+                    <button onclick="loginTeacher()" class="w-full bg-purple-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-purple-700">
+                        Masuk sebagai Guru
+                    </button>
+                    <button onclick="backToRoleSelection()" class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600">
+                        Kembali
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Login Modal -->
+        <div id="student-login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold text-center mb-6">👨‍🎓 Login Siswa</h2>
+                <div class="space-y-4">
+                    <input type="text" id="student-name" placeholder="Nama lengkap" class="w-full border rounded-lg px-4 py-3 text-lg">
+                    <input type="text" id="student-class" placeholder="Kelas (contoh: 5A)" class="w-full border rounded-lg px-4 py-3 text-lg">
+                    <input type="text" id="game-pin" placeholder="Masukkan PIN game (6 digit)" class="w-full border rounded-lg px-4 py-3 text-lg text-center font-mono" maxlength="6">
+                    <button onclick="loginStudent()" class="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-indigo-700">
+                        Bergabung ke Game
+                    </button>
+                    <button onclick="backToRoleSelection()" class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600">
+                        Kembali
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time & Calendar Widget -->
+        <div class="fixed top-4 left-4 z-40">
+            <div class="glass-effect rounded-xl p-4 text-white slide-in">
+                <div class="text-center mb-3">
+                    <div class="time-display text-2xl font-bold" id="current-time">00:00:00</div>
+                    <div class="text-sm opacity-90" id="current-date">Loading...</div>
+                </div>
+                <button onclick="toggleCalendar()" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg py-2 px-3 text-sm transition-all">
+                    📅 Kalender
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendar Modal -->
+        <div id="calendar-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 slide-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800" id="calendar-month-year">Januari 2024</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="changeMonth(-1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">‹</button>
+                        <button onclick="changeMonth(1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">›</button>
+                        <button onclick="toggleCalendar()" class="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center">×</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Min</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Sen</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Sel</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Rab</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Kam</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Jum</div>
+                    <div class="text-center text-sm font-bold text-gray-600 py-2">Sab</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-8 relative z-10">
+            <h1 class="text-5xl font-bold text-white mb-3 sparkle">🎮 Platform Game Edukasi</h1>
+            <p class="text-white text-lg opacity-90">Buat dan mainkan game edukatif untuk siswa Anda</p>
+            <div class="mt-4 glass-effect rounded-lg p-3 max-w-2xl mx-auto">
+                <p class="text-white text-sm opacity-80">
+                    💾 <strong>Mode Offline:</strong> Platform ini dapat berjalan tanpa internet! 
+                    Simpan file HTML ini di komputer dan buka dengan browser kapan saja.
+                </p>
+            </div>
+            
+            <!-- User Info & Controls -->
+            <div id="user-info" class="hidden mt-6 glass-effect rounded-xl p-6 floating-card">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white bg-opacity-20 rounded-full p-3 pulse-animation">
+                            <span class="text-3xl" id="user-icon">👤</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-bold text-white text-xl" id="current-user-name"></p>
+                            <p class="text-white opacity-80" id="current-user-class"></p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="showUserList()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-lg">
+                            👥 Daftar Siswa (<span id="user-count">0</span>)
+                        </button>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-lg">
+                            🚪 Keluar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game PIN Display (for teachers) -->
+            <div id="game-pin-display" class="hidden mt-6 glass-effect rounded-xl p-8 floating-card sparkle">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold mb-4 text-white">📌 PIN Game Aktif</h3>
+                    <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-inner">
+                        <p class="text-4xl font-mono font-bold text-purple-800 pulse-animation" id="current-game-pin">------</p>
+                        <p class="text-purple-600 mt-3">Bagikan PIN ini kepada siswa</p>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="copyGamePin()" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg">
+                            📋 Salin PIN
+                        </button>
+                        <button onclick="generateNewPin()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg">
+                            🔄 PIN Baru
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User List Modal -->
+        <div id="user-list-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">👥 Daftar Siswa Online</h2>
+                    <button onclick="closeUserList()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <div id="user-list-content" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Game Selection (Only for Teachers) -->
+        <div id="game-selection" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 relative z-10">
+            <button onclick="showGame('crossword')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #8b5cf6; --card-color-2: #a855f7;">
+                <div class="text-5xl mb-4 pulse-animation">🧩</div>
+                <h3 class="font-bold text-xl mb-2">Teka-teki Silang</h3>
+                <p class="text-sm opacity-90">Asah kemampuan berpikir dengan teka-teki silang</p>
+            </button>
+            <button onclick="showGame('multiple-choice')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #10b981; --card-color-2: #059669;">
+                <div class="text-5xl mb-4 pulse-animation">✅</div>
+                <h3 class="font-bold text-xl mb-2">Pilihan Ganda</h3>
+                <p class="text-sm opacity-90">Uji pengetahuan dengan soal pilihan ganda</p>
+            </button>
+            <button onclick="showGame('word-search')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #3b82f6; --card-color-2: #2563eb;">
+                <div class="text-5xl mb-4 pulse-animation">🔍</div>
+                <h3 class="font-bold text-xl mb-2">Mencari Kata</h3>
+                <p class="text-sm opacity-90">Temukan kata tersembunyi dalam grid</p>
+            </button>
+            <button onclick="showGame('puzzle')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #f59e0b; --card-color-2: #d97706;">
+                <div class="text-5xl mb-4 pulse-animation">🧩</div>
+                <h3 class="font-bold text-xl mb-2">Puzzle</h3>
+                <p class="text-sm opacity-90">Susun potongan puzzle dengan urutan benar</p>
+            </button>
+            <button onclick="showGame('matching')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #ec4899; --card-color-2: #be185d;">
+                <div class="text-5xl mb-4 pulse-animation">🔗</div>
+                <h3 class="font-bold text-xl mb-2">Menjodohkan</h3>
+                <p class="text-sm opacity-90">Tarik garis untuk mencocokkan kata dengan pasangannya</p>
+            </button>
+            <button onclick="showGame('word-scramble')" class="game-card text-white p-8 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 sparkle" style="--card-color-1: #7c3aed; --card-color-2: #5b21b6;">
+                <div class="text-5xl mb-4 pulse-animation">🔤</div>
+                <h3 class="font-bold text-xl mb-2">Susun Huruf</h3>
+                <p class="text-sm opacity-90">Susun huruf yang diacak menjadi kata yang benar</p>
+            </button>
+        </div>
+
+        <!-- Student Game Message -->
+        <div id="student-game-message" class="hidden text-center mb-12 relative z-10">
+            <div class="glass-effect rounded-2xl p-10 shadow-2xl floating-card sparkle">
+                <div class="text-6xl mb-6 pulse-animation">🎮</div>
+
+                <h2 class="text-3xl font-bold mb-6 text-white">Selamat Datang di Game Edukasi!</h2>
+                <p class="text-xl mb-4 text-white opacity-90">Anda telah bergabung ke dalam game yang dibuat oleh guru.</p>
+                <p class="text-lg text-white opacity-80">Game akan dimuat secara otomatis. Selamat bermain dan belajar! 📚✨</p>
+                <div class="mt-8 flex justify-center">
+                    <div class="bg-white bg-opacity-20 rounded-full px-6 py-3">
+                        <span class="text-white font-bold">🌟 Siap untuk belajar sambil bermain? 🌟</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crossword Game -->
+        <div id="crossword-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-800 mb-4">🧩 Teka-teki Silang</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-purple-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Soal Baru:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="crossword-clue" placeholder="Petunjuk soal" class="border rounded-lg px-3 py-2">
+                        <input type="text" id="crossword-answer" placeholder="Jawaban" class="border rounded-lg px-3 py-2">
+                        <button onclick="addCrosswordClue()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600">Tambah Soal</button>
+                        <button onclick="generateGamePin('crossword')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" id="crossword-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold mb-3">Petunjuk:</h4>
+                        <div id="crossword-clues" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3">Teka-teki:</h4>
+                        <div id="crossword-grid" class="inline-block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiple Choice Game -->
+        <div id="multiple-choice-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">✅ Pilihan Ganda</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-green-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Soal Baru:</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="mc-question" placeholder="Pertanyaan" class="w-full border rounded-lg px-3 py-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input type="text" id="mc-option1" placeholder="Pilihan A" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="mc-option2" placeholder="Pilihan B" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="mc-option3" placeholder="Pilihan C" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="mc-option4" placeholder="Pilihan D" class="border rounded-lg px-3 py-2">
+                        </div>
+                        <select id="mc-correct" class="border rounded-lg px-3 py-2">
+                            <option value="">Pilih jawaban yang benar</option>
+                            <option value="0">A</option>
+                            <option value="1">B</option>
+                            <option value="2">C</option>
+                            <option value="3">D</option>
+                        </select>
+                        <button onclick="addMCQuestion()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Tambah Soal</button>
+                        <button onclick="generateGamePin('multiple-choice')" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600" id="mc-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div id="mc-game-area">
+                    <div id="mc-question-display" class="text-center">
+                        <p class="text-gray-500">Tambahkan soal untuk mulai bermain</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word Search Game -->
+        <div id="word-search-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">🔍 Mencari Kata</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Kata Baru:</h3>
+                    <div class="flex gap-3">
+                        <input type="text" id="word-input" placeholder="Masukkan kata" class="flex-1 border rounded-lg px-3 py-2">
+                        <button onclick="addWord()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Tambah Kata</button>
+                        <button onclick="generateWordSearch()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Buat Grid</button>
+                        <button onclick="generateGamePin('word-search')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" id="word-search-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold mb-3">Kata yang dicari:</h4>
+                        <div id="word-list" class="grid grid-cols-2 gap-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-3">Grid Pencarian:</h4>
+                        <div id="word-search-grid" class="inline-block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puzzle Game -->
+        <div id="puzzle-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-orange-800 mb-4">🧩 Puzzle</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-orange-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Puzzle Baru:</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="puzzle-question" placeholder="Pertanyaan atau tema puzzle" class="w-full border rounded-lg px-3 py-2">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <input type="text" id="puzzle-piece1" placeholder="Bagian 1" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="puzzle-piece2" placeholder="Bagian 2" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="puzzle-piece3" placeholder="Bagian 3" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="puzzle-piece4" placeholder="Bagian 4" class="border rounded-lg px-3 py-2">
+                        </div>
+                        <button onclick="createPuzzle()" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">Buat Puzzle</button>
+                        <button onclick="generateGamePin('puzzle')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" id="puzzle-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div id="puzzle-area" class="text-center">
+                    <p class="text-gray-500 mb-4">Buat puzzle untuk mulai bermain</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matching Game -->
+        <div id="matching-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-pink-800 mb-4">🔗 Menjodohkan</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-pink-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Pasangan Kata:</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input type="text" id="match-left" placeholder="Kata kiri (contoh: Kucing)" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="match-right" placeholder="Kata kanan (contoh: Meong)" class="border rounded-lg px-3 py-2">
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="addMatchingPair()" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600">Tambah Pasangan</button>
+                            <button onclick="startMatchingGame()" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700">Mulai Game</button>
+                            <button onclick="generateGamePin('matching')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" id="matching-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div id="matching-area" class="text-center">
+                    <p class="text-gray-500 mb-4">Tambahkan pasangan kata untuk mulai bermain</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word Scramble Game -->
+        <div id="word-scramble-game" class="game-section hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-800 mb-4">🔤 Susun Huruf</h2>
+                
+                <!-- Input Form -->
+                <div class="mb-6 p-4 bg-purple-50 rounded-lg">
+                    <h3 class="font-bold mb-3">Input Kata Baru:</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input type="text" id="scramble-word" placeholder="Kata yang akan diacak" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="scramble-hint" placeholder="Petunjuk (opsional)" class="border rounded-lg px-3 py-2">
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="addScrambleWord()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600">Tambah Kata</button>
+                            <button onclick="startScrambleGame()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">Mulai Game</button>
+                            <button onclick="generateGamePin('word-scramble')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" id="word-scramble-pin-btn" style="display: none;">🎯 Generate PIN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div id="scramble-area" class="text-center">
+                    <p class="text-gray-500 mb-4">Tambahkan kata untuk mulai bermain</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notification" class="fixed top-4 right-4 z-50 hidden"></div>
+
+    <script>
+        // Global variables
+        let crosswordData = [];
+        let mcQuestions = [];
+        let currentMCIndex = 0;
+        let wordsToFind = [];
+        let wordSearchGrid = [];
+        let foundWords = [];
+        let puzzlePieces = [];
+        let puzzleSlots = [];
+        let matchingPairs = [];
+        let selectedMatchingItem = null;
+        let matchedPairs = [];
+        let scrambleWords = [];
+        let currentScrambleIndex = 0;
+        let currentScrambledLetters = [];
+        let currentAnswerSlots = [];
+        let currentUser = null;
+        let loggedInUsers = JSON.parse(localStorage.getItem('loggedInUsers')) || [];
+        let gameData = JSON.parse(localStorage.getItem('gameData')) || {};
+        let currentGamePin = null;
+        let isTeacher = false;
+
+        // Offline functionality - data disimpan di browser lokal
+        // Semua game dan progress tersimpan otomatis tanpa perlu internet
+
+        // Role selection functions
+        function showTeacherLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('teacher-login-modal').classList.remove('hidden');
+        }
+
+        function showStudentLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('student-login-modal').classList.remove('hidden');
+        }
+
+        function backToRoleSelection() {
+            document.getElementById('teacher-login-modal').classList.add('hidden');
+            document.getElementById('student-login-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        // Teacher login
+        function loginTeacher() {
+            const name = document.getElementById('teacher-name').value.trim();
+            const subject = document.getElementById('teacher-subject').value.trim();
+            
+            if (!name || !subject) {
+                showNotification('⚠️ Mohon isi nama dan mata pelajaran!', 'warning');
+                return;
+            }
+            
+            currentUser = {
+                id: Date.now(),
+                name: name,
+                subject: subject,
+                role: 'teacher',
+                loginTime: new Date().toLocaleString('id-ID')
+            };
+            
+            isTeacher = true;
+            
+            // Hide login modal and show main interface
+            document.getElementById('teacher-login-modal').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('game-selection').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('user-icon').textContent = '👨‍🏫';
+            document.getElementById('current-user-name').textContent = name;
+            document.getElementById('current-user-class').textContent = `Guru ${subject}`;
+            document.getElementById('user-count').textContent = loggedInUsers.length;
+            
+            showNotification(`🎉 Selamat datang, Guru ${name}!`, 'success');
+            
+            // Clear form
+            document.getElementById('teacher-name').value = '';
+            document.getElementById('teacher-subject').value = '';
+        }
+
+        // Student login
+        function loginStudent() {
+            const name = document.getElementById('student-name').value.trim();
+            const studentClass = document.getElementById('student-class').value.trim();
+            const gamePin = document.getElementById('game-pin').value.trim();
+            
+            if (!name || !studentClass || !gamePin) {
+                showNotification('⚠️ Mohon isi semua field!', 'warning');
+                return;
+            }
+            
+            // Validate PIN
+            if (!gameData[gamePin]) {
+                showNotification('❌ PIN game tidak valid!', 'error');
+                return;
+            }
+            
+            // Check if user already exists in this game
+            const existingUser = loggedInUsers.find(user => 
+                user.name.toLowerCase() === name.toLowerCase() && 
+                user.class.toLowerCase() === studentClass.toLowerCase() &&
+                user.gamePin === gamePin
+            );
+            
+            if (existingUser) {
+                showNotification('⚠️ Siswa dengan nama dan kelas ini sudah bergabung!', 'warning');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                class: studentClass,
+                gamePin: gamePin,
+                role: 'student',
+                loginTime: new Date().toLocaleString('id-ID')
+            };
+            
+            loggedInUsers.push(newUser);
+            localStorage.setItem('loggedInUsers', JSON.stringify(loggedInUsers));
+            currentUser = newUser;
+            currentGamePin = gamePin;
+            
+            // Load game data
+            loadGameFromPin(gamePin);
+            
+            // Hide login modal and show main interface
+            document.getElementById('student-login-modal').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            // Students don't see game selection - they go directly to their assigned game
+            document.getElementById('student-game-message').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('user-icon').textContent = '👨‍🎓';
+            document.getElementById('current-user-name').textContent = name;
+            document.getElementById('current-user-class').textContent = `Kelas ${studentClass}`;
+            document.getElementById('user-count').textContent = loggedInUsers.filter(u => u.gamePin === gamePin).length;
+            
+            showNotification(`🎉 Berhasil bergabung ke game ${gameData[gamePin].type}!`, 'success');
+            
+            // Clear form
+            document.getElementById('student-name').value = '';
+            document.getElementById('student-class').value = '';
+            document.getElementById('game-pin').value = '';
+        }
+        
+        // PIN and game management functions
+        function generateGamePin(gameType) {
+            const pin = Math.floor(100000 + Math.random() * 900000).toString();
+            currentGamePin = pin;
+            
+            // Save game data
+            const gameInfo = {
+                type: gameType,
+                createdBy: currentUser.name,
+                createdAt: new Date().toLocaleString('id-ID'),
+                data: getGameData(gameType)
+            };
+            
+            gameData[pin] = gameInfo;
+            localStorage.setItem('gameData', JSON.stringify(gameData));
+            
+            // Show PIN display
+            document.getElementById('game-pin-display').classList.remove('hidden');
+            document.getElementById('current-game-pin').textContent = pin;
+            
+            showNotification(`🎯 PIN game berhasil dibuat: ${pin}`, 'success');
+        }
+        
+        function getGameData(gameType) {
+            switch(gameType) {
+                case 'crossword':
+                    return { clues: crosswordData };
+                case 'multiple-choice':
+                    return { questions: mcQuestions };
+                case 'word-search':
+                    return { words: wordsToFind };
+                case 'puzzle':
+                    return { pieces: puzzlePieces };
+                case 'matching':
+                    return { pairs: matchingPairs };
+                case 'word-scramble':
+                    return { words: scrambleWords };
+                default:
+                    return {};
+            }
+        }
+        
+        function loadGameFromPin(pin) {
+            const game = gameData[pin];
+            if (!game) return;
+            
+            switch(game.type) {
+                case 'crossword':
+                    crosswordData = game.data.clues || [];
+                    updateCrosswordDisplay();
+                    showGame('crossword');
+                    break;
+                case 'multiple-choice':
+                    mcQuestions = game.data.questions || [];
+                    currentMCIndex = 0;
+                    displayMCQuestion();
+                    showGame('multiple-choice');
+                    break;
+                case 'word-search':
+                    wordsToFind = game.data.words || [];
+                    updateWordList();
+                    generateWordSearch();
+                    showGame('word-search');
+                    break;
+                case 'puzzle':
+                    puzzlePieces = game.data.pieces || [];
+                    showGame('puzzle');
+                    break;
+                case 'matching':
+                    matchingPairs = game.data.pairs || [];
+                    startMatchingGame();
+                    showGame('matching');
+                    break;
+                case 'word-scramble':
+                    scrambleWords = game.data.words || [];
+                    currentScrambleIndex = 0;
+                    startScrambleGame();
+                    showGame('word-scramble');
+                    break;
+            }
+        }
+        
+        function copyGamePin() {
+            const pin = document.getElementById('current-game-pin').textContent;
+            navigator.clipboard.writeText(pin).then(() => {
+                showNotification('📋 PIN berhasil disalin!', 'success');
+            }).catch(() => {
+                showNotification('❌ Gagal menyalin PIN', 'error');
+            });
+        }
+        
+        function generateNewPin() {
+            if (currentGamePin) {
+                const gameType = gameData[currentGamePin].type;
+                generateGamePin(gameType);
+            }
+        }
+
+        function logout() {
+            if (currentUser) {
+                // Remove user from logged in users
+                loggedInUsers = loggedInUsers.filter(user => user.id !== currentUser.id);
+                localStorage.setItem('loggedInUsers', JSON.stringify(loggedInUsers));
+                
+                showNotification(`👋 Sampai jumpa, ${currentUser.name}!`, 'info');
+                currentUser = null;
+                isTeacher = false;
+                currentGamePin = null;
+                
+                // Show login modal and hide main interface
+                document.getElementById('login-modal').classList.remove('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('game-selection').classList.add('hidden');
+                document.getElementById('game-pin-display').classList.add('hidden');
+                document.getElementById('student-game-message').classList.add('hidden');
+                
+                // Hide all game sections
+                document.querySelectorAll('.game-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+            }
+        }
+        
+        function showUserList() {
+            const modal = document.getElementById('user-list-modal');
+            const content = document.getElementById('user-list-content');
+            
+            content.innerHTML = '';
+            
+            // Filter users based on current game PIN (for students) or show all (for teachers)
+            let usersToShow = loggedInUsers;
+            if (!isTeacher && currentGamePin) {
+                usersToShow = loggedInUsers.filter(user => user.gamePin === currentGamePin);
+            }
+            
+            if (usersToShow.length === 0) {
+                content.innerHTML = '<p class="text-gray-500 text-center">Belum ada siswa yang bergabung</p>';
+            } else {
+                usersToShow.forEach((user, index) => {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg';
+                    const userIcon = user.role === 'teacher' ? '👨‍🏫' : '👨‍🎓';
+                    const userRole = user.role === 'teacher' ? `Guru ${user.subject}` : `Kelas ${user.class}`;
+                    const gameInfo = user.gamePin ? `<p class="text-xs text-blue-600">PIN: ${user.gamePin}</p>` : '';
+                    
+                    userDiv.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-indigo-100 rounded-full p-2">
+                                <span class="text-lg">${userIcon}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-indigo-800">${user.name}</p>
+                                <p class="text-sm text-gray-600">${userRole}</p>
+                                ${gameInfo}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Login: ${user.loginTime}</p>
+                            <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span class="text-xs text-green-600 ml-1">Online</span>
+                        </div>
+                    `;
+                    content.appendChild(userDiv);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeUserList() {
+            document.getElementById('user-list-modal').classList.add('hidden');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const colors = {
+                success: 'bg-green-500',
+                warning: 'bg-yellow-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.className = `fixed top-4 right-4 z-50 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300`;
+            notification.textContent = message;
+            notification.classList.remove('hidden');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Initialize user count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('user-count').textContent = loggedInUsers.length;
+        });
+
+        // Show specific game
+        function showGame(gameType) {
+            document.querySelectorAll('.game-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(gameType + '-game').classList.remove('hidden');
+            
+            // Hide input forms for students
+            if (!isTeacher) {
+                hideInputFormsForStudents(gameType);
+            }
+        }
+        
+        function hideInputFormsForStudents(gameType) {
+            // Hide all input forms and PIN generation buttons for students
+            const inputForms = document.querySelectorAll(`#${gameType}-game .bg-${getGameColor(gameType)}-50`);
+            inputForms.forEach(form => {
+                form.style.display = 'none';
+            });
+            
+            // Hide PIN generation buttons
+            const pinButtons = document.querySelectorAll(`#${gameType}-pin-btn`);
+            pinButtons.forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+        
+        function getGameColor(gameType) {
+            const colors = {
+                'crossword': 'purple',
+                'multiple-choice': 'green',
+                'word-search': 'blue',
+                'puzzle': 'orange',
+                'matching': 'pink',
+                'word-scramble': 'purple'
+            };
+            return colors[gameType] || 'gray';
+        }
+
+        // Crossword functions
+        function addCrosswordClue() {
+            const clue = document.getElementById('crossword-clue').value.trim();
+            const answer = document.getElementById('crossword-answer').value.trim().toUpperCase();
+            
+            if (clue && answer) {
+                crosswordData.push({ clue, answer, number: crosswordData.length + 1 });
+                updateCrosswordDisplay();
+                document.getElementById('crossword-clue').value = '';
+                document.getElementById('crossword-answer').value = '';
+                
+                // Show PIN button for teachers
+                if (isTeacher && crosswordData.length > 0) {
+                    document.getElementById('crossword-pin-btn').style.display = 'inline-block';
+                }
+            }
+        }
+
+        function updateCrosswordDisplay() {
+            const cluesDiv = document.getElementById('crossword-clues');
+            cluesDiv.innerHTML = '';
+            
+            crosswordData.forEach((item, index) => {
+                const clueDiv = document.createElement('div');
+                clueDiv.className = 'p-2 bg-gray-50 rounded';
+                clueDiv.innerHTML = `<strong>${index + 1}.</strong> ${item.clue} (${item.answer.length} huruf)`;
+                cluesDiv.appendChild(clueDiv);
+            });
+
+            generateCrosswordGrid();
+        }
+
+        function generateCrosswordGrid() {
+            const gridDiv = document.getElementById('crossword-grid');
+            gridDiv.innerHTML = '';
+            
+            if (crosswordData.length === 0) return;
+
+            const gridSize = 15;
+            const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+            const placedWords = [];
+            
+            // Place first word horizontally in the middle
+            if (crosswordData.length > 0) {
+                const firstWord = crosswordData[0];
+                const startRow = Math.floor(gridSize / 2);
+                const startCol = Math.floor((gridSize - firstWord.answer.length) / 2);
+                
+                for (let i = 0; i < firstWord.answer.length; i++) {
+                    grid[startRow][startCol + i] = firstWord.answer[i];
+                }
+                
+                placedWords.push({
+                    word: firstWord.answer,
+                    row: startRow,
+                    col: startCol,
+                    direction: 'horizontal',
+                    number: firstWord.number
+                });
+            }
+            
+            // Try to place remaining words by finding intersections
+            for (let wordIndex = 1; wordIndex < crosswordData.length; wordIndex++) {
+                const currentWord = crosswordData[wordIndex];
+                let placed = false;
+                
+                // Try to intersect with each placed word
+                for (let placedWord of placedWords) {
+                    if (placed) break;
+                    
+                    // Find common letters
+                    for (let i = 0; i < currentWord.answer.length; i++) {
+                        for (let j = 0; j < placedWord.word.length; j++) {
+                            if (currentWord.answer[i] === placedWord.word[j]) {
+                                // Try to place perpendicular to placed word
+                                let newRow, newCol, newDirection;
+                                
+                                if (placedWord.direction === 'horizontal') {
+                                    // Place vertically
+                                    newRow = placedWord.row - i;
+                                    newCol = placedWord.col + j;
+                                    newDirection = 'vertical';
+                                } else {
+                                    // Place horizontally
+                                    newRow = placedWord.row + j;
+                                    newCol = placedWord.col - i;
+                                    newDirection = 'horizontal';
+                                }
+                                
+                                // Check if placement is valid
+                                if (canPlaceWordInCrossword(grid, currentWord.answer, newRow, newCol, newDirection, gridSize)) {
+                                    // Place the word
+                                    placeWordInCrossword(grid, currentWord.answer, newRow, newCol, newDirection);
+                                    placedWords.push({
+                                        word: currentWord.answer,
+                                        row: newRow,
+                                        col: newCol,
+                                        direction: newDirection,
+                                        number: currentWord.number
+                                    });
+                                    placed = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (placed) break;
+                    }
+                }
+                
+                // If couldn't intersect, try to place independently
+                if (!placed) {
+                    for (let attempts = 0; attempts < 20; attempts++) {
+                        const direction = Math.random() > 0.5 ? 'horizontal' : 'vertical';
+                        const row = Math.floor(Math.random() * (gridSize - (direction === 'vertical' ? currentWord.answer.length : 1)));
+                        const col = Math.floor(Math.random() * (gridSize - (direction === 'horizontal' ? currentWord.answer.length : 1)));
+                        
+                        if (canPlaceWordInCrossword(grid, currentWord.answer, row, col, direction, gridSize)) {
+                            placeWordInCrossword(grid, currentWord.answer, row, col, direction);
+                            placedWords.push({
+                                word: currentWord.answer,
+                                row: row,
+                                col: col,
+                                direction: direction,
+                                number: currentWord.number
+                            });
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Create HTML grid with numbers
+            const table = document.createElement('table');
+            table.className = 'border-collapse';
+            
+            for (let i = 0; i < gridSize; i++) {
+                const row = document.createElement('tr');
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('td');
+                    cell.className = 'crossword-cell relative';
+                    
+                    if (grid[i][j]) {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.className = 'w-full h-full text-center border-0 outline-0 uppercase';
+                        input.style.background = 'white';
+                        input.dataset.answer = grid[i][j];
+                        input.oninput = checkCrosswordAnswer;
+                        cell.appendChild(input);
+                        
+                        // Add number if this is the start of a word
+                        const wordStart = placedWords.find(word => 
+                            word.row === i && word.col === j
+                        );
+                        if (wordStart) {
+                            const numberDiv = document.createElement('div');
+                            numberDiv.className = 'absolute top-0 left-0 text-xs font-bold text-blue-600';
+                            numberDiv.style.fontSize = '10px';
+                            numberDiv.textContent = wordStart.number;
+                            cell.appendChild(numberDiv);
+                        }
+                    } else {
+                        cell.style.background = '#333';
+                    }
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+            gridDiv.appendChild(table);
+            
+            // Add check button
+            const checkButton = document.createElement('button');
+            checkButton.textContent = 'Periksa Jawaban';
+            checkButton.className = 'mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600';
+            checkButton.onclick = checkAllCrosswordAnswers;
+            gridDiv.appendChild(checkButton);
+        }
+        
+        function canPlaceWordInCrossword(grid, word, row, col, direction, gridSize) {
+            if (direction === 'horizontal') {
+                if (col + word.length > gridSize) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[row][col + i] && grid[row][col + i] !== word[i]) {
+                        return false;
+                    }
+                }
+            } else {
+                if (row + word.length > gridSize) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[row + i][col] && grid[row + i][col] !== word[i]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        function placeWordInCrossword(grid, word, row, col, direction) {
+            if (direction === 'horizontal') {
+                for (let i = 0; i < word.length; i++) {
+                    grid[row][col + i] = word[i];
+                }
+            } else {
+                for (let i = 0; i < word.length; i++) {
+                    grid[row + i][col] = word[i];
+                }
+            }
+        }
+        
+        function checkCrosswordAnswer(event) {
+            const input = event.target;
+            const userAnswer = input.value.toUpperCase();
+            const correctAnswer = input.dataset.answer;
+            
+            if (userAnswer === correctAnswer) {
+                input.style.backgroundColor = '#dcfce7'; // light green
+                input.style.color = '#166534'; // dark green
+            } else if (userAnswer) {
+                input.style.backgroundColor = '#fecaca'; // light red
+                input.style.color = '#dc2626'; // dark red
+            } else {
+                input.style.backgroundColor = 'white';
+                input.style.color = 'black';
+            }
+        }
+        
+        function checkAllCrosswordAnswers() {
+            const inputs = document.querySelectorAll('#crossword-grid input');
+            let correct = 0;
+            let total = inputs.length;
+            
+            inputs.forEach(input => {
+                const userAnswer = input.value.toUpperCase();
+                const correctAnswer = input.dataset.answer;
+                
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                    input.style.backgroundColor = '#dcfce7';
+                    input.style.color = '#166534';
+                } else {
+                    input.style.backgroundColor = '#fecaca';
+                    input.style.color = '#dc2626';
+                }
+            });
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `mt-4 p-4 rounded-lg text-center font-bold ${correct === total ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`;
+            resultDiv.textContent = correct === total ? 
+                '🎉 Selamat! Semua jawaban benar!' : 
+                `📝 Benar: ${correct}/${total}. Coba lagi!`;
+            
+            const existingResult = document.querySelector('#crossword-grid .mt-4.p-4');
+            if (existingResult) existingResult.remove();
+            
+            document.getElementById('crossword-grid').appendChild(resultDiv);
+        }
+
+        // Multiple Choice functions
+        function addMCQuestion() {
+            const question = document.getElementById('mc-question').value.trim();
+            const options = [
+                document.getElementById('mc-option1').value.trim(),
+                document.getElementById('mc-option2').value.trim(),
+                document.getElementById('mc-option3').value.trim(),
+                document.getElementById('mc-option4').value.trim()
+            ];
+            const correct = parseInt(document.getElementById('mc-correct').value);
+
+            if (question && options.every(opt => opt) && correct !== '') {
+                mcQuestions.push({ question, options, correct });
+                currentMCIndex = 0;
+                displayMCQuestion();
+                
+                // Show PIN button for teachers
+                if (isTeacher && mcQuestions.length > 0) {
+                    document.getElementById('mc-pin-btn').style.display = 'inline-block';
+                }
+                
+                // Clear form
+                document.getElementById('mc-question').value = '';
+                document.getElementById('mc-option1').value = '';
+                document.getElementById('mc-option2').value = '';
+                document.getElementById('mc-option3').value = '';
+                document.getElementById('mc-option4').value = '';
+                document.getElementById('mc-correct').value = '';
+            }
+        }
+
+        function displayMCQuestion() {
+            const gameArea = document.getElementById('mc-game-area');
+            
+            if (mcQuestions.length === 0) {
+                gameArea.innerHTML = '<p class="text-gray-500 text-center">Tambahkan soal untuk mulai bermain</p>';
+                return;
+            }
+
+            const current = mcQuestions[currentMCIndex];
+            gameArea.innerHTML = `
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold mb-4">Soal ${currentMCIndex + 1} dari ${mcQuestions.length}</h3>
+                    <p class="text-lg mb-6">${current.question}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                        ${current.options.map((option, index) => `
+                            <button onclick="checkMCAnswer(${index})" 
+                                    class="p-4 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all text-left">
+                                <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="prevMCQuestion()" class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-600" ${currentMCIndex === 0 ? 'disabled' : ''}>Sebelumnya</button>
+                        <button onclick="nextMCQuestion()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" ${currentMCIndex === mcQuestions.length - 1 ? 'disabled' : ''}>Selanjutnya</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkMCAnswer(selectedIndex) {
+            const current = mcQuestions[currentMCIndex];
+            const buttons = document.querySelectorAll('#mc-game-area button');
+            
+            buttons.forEach((btn, index) => {
+                if (index === current.correct + 1) { // +1 because first button is prev
+                    btn.classList.add('bg-green-500', 'text-white', 'border-green-500');
+                } else if (index === selectedIndex + 1 && selectedIndex !== current.correct) {
+                    btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                }
+                btn.disabled = true;
+            });
+
+            setTimeout(() => {
+                if (currentMCIndex < mcQuestions.length - 1) {
+                    nextMCQuestion();
+                }
+            }, 2000);
+        }
+
+        function nextMCQuestion() {
+            if (currentMCIndex < mcQuestions.length - 1) {
+                currentMCIndex++;
+                displayMCQuestion();
+            }
+        }
+
+        function prevMCQuestion() {
+            if (currentMCIndex > 0) {
+                currentMCIndex--;
+                displayMCQuestion();
+            }
+        }
+
+        // Word Search functions
+        function addWord() {
+            const word = document.getElementById('word-input').value.trim().toUpperCase();
+            if (word && !wordsToFind.includes(word)) {
+                wordsToFind.push(word);
+                updateWordList();
+                document.getElementById('word-input').value = '';
+            }
+        }
+
+        function updateWordList() {
+            const wordListDiv = document.getElementById('word-list');
+            wordListDiv.innerHTML = '';
+            
+            wordsToFind.forEach(word => {
+                const wordDiv = document.createElement('div');
+                wordDiv.className = `p-2 rounded ${foundWords.includes(word) ? 'bg-green-200 line-through' : 'bg-gray-100'}`;
+                wordDiv.textContent = word;
+                wordListDiv.appendChild(wordDiv);
+            });
+        }
+
+        function generateWordSearch() {
+            if (wordsToFind.length === 0) return;
+
+            const gridSize = 12;
+            wordSearchGrid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+            
+            // Place words randomly
+            wordsToFind.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 50) {
+                    const direction = Math.floor(Math.random() * 3); // 0: horizontal, 1: vertical, 2: diagonal
+                    const row = Math.floor(Math.random() * gridSize);
+                    const col = Math.floor(Math.random() * gridSize);
+                    
+                    if (canPlaceWord(word, row, col, direction, gridSize)) {
+                        placeWord(word, row, col, direction);
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            });
+
+            // Fill empty cells with random letters
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (!wordSearchGrid[i][j]) {
+                        wordSearchGrid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    }
+                }
+            }
+
+            displayWordSearchGrid();
+            
+            // Show PIN button for teachers
+            if (isTeacher && wordsToFind.length > 0) {
+                document.getElementById('word-search-pin-btn').style.display = 'inline-block';
+            }
+        }
+
+        function canPlaceWord(word, row, col, direction, gridSize) {
+            const directions = [[0, 1], [1, 0], [1, 1]]; // horizontal, vertical, diagonal
+            const [dRow, dCol] = directions[direction];
+            
+            for (let i = 0; i < word.length; i++) {
+                const newRow = row + i * dRow;
+                const newCol = col + i * dCol;
+                
+                if (newRow >= gridSize || newCol >= gridSize || 
+                    (wordSearchGrid[newRow][newCol] && wordSearchGrid[newRow][newCol] !== word[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function placeWord(word, row, col, direction) {
+            const directions = [[0, 1], [1, 0], [1, 1]];
+            const [dRow, dCol] = directions[direction];
+            
+            for (let i = 0; i < word.length; i++) {
+                const newRow = row + i * dRow;
+                const newCol = col + i * dCol;
+                wordSearchGrid[newRow][newCol] = word[i];
+            }
+        }
+
+        function displayWordSearchGrid() {
+            const gridDiv = document.getElementById('word-search-grid');
+            gridDiv.innerHTML = '';
+            
+            const table = document.createElement('table');
+            table.className = 'border-collapse';
+            
+            for (let i = 0; i < wordSearchGrid.length; i++) {
+                const row = document.createElement('tr');
+                for (let j = 0; j < wordSearchGrid[i].length; j++) {
+                    const cell = document.createElement('td');
+                    cell.className = 'word-search-cell';
+                    cell.textContent = wordSearchGrid[i][j];
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.ondblclick = () => selectWordCell(i, j, cell);
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+            gridDiv.appendChild(table);
+            
+            // Add instruction
+            const instruction = document.createElement('div');
+            instruction.className = 'mt-4 p-3 bg-blue-50 rounded-lg text-center text-blue-800';
+            instruction.innerHTML = '💡 <strong>Cara bermain:</strong> Double-click huruf awal kata, lalu double-click huruf akhir kata untuk menandai kata yang ditemukan!';
+            gridDiv.appendChild(instruction);
+        }
+
+        let firstSelectedCell = null;
+        let isSelectingWord = false;
+
+        function selectWordCell(row, col, cellElement) {
+            // If this is the first selection
+            if (!firstSelectedCell) {
+                firstSelectedCell = { row, col, element: cellElement };
+                cellElement.classList.add('bg-blue-300');
+                cellElement.style.border = '3px solid #2563eb';
+                isSelectingWord = true;
+                
+                // Show instruction for second click
+                showWordSearchInstruction('Sekarang double-click huruf akhir kata!');
+                return;
+            }
+            
+            // If this is the second selection
+            if (firstSelectedCell && isSelectingWord) {
+                const secondCell = { row, col, element: cellElement };
+                
+                // Get all cells between first and second selection
+                const pathCells = getPathBetweenCells(firstSelectedCell, secondCell);
+                
+                if (pathCells.length > 0) {
+                    // Extract word from path
+                    const word = pathCells.map(cell => wordSearchGrid[cell.row][cell.col]).join('');
+                    const reverseWord = word.split('').reverse().join('');
+                    
+                    // Check if word exists in word list
+                    if (wordsToFind.includes(word) || wordsToFind.includes(reverseWord)) {
+                        const foundWord = wordsToFind.includes(word) ? word : reverseWord;
+                        
+                        if (!foundWords.includes(foundWord)) {
+                            // Mark word as found
+                            foundWords.push(foundWord);
+                            
+                            // Highlight all cells in the path
+                            pathCells.forEach(cell => {
+                                const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                                if (cellElement) {
+                                    cellElement.classList.remove('bg-blue-300', 'bg-yellow-300');
+                                    cellElement.classList.add('found');
+                                    cellElement.style.border = '1px solid #ddd';
+                                }
+                            });
+                            
+                            updateWordList();
+                            showWordSearchInstruction(`✅ Kata "${foundWord}" ditemukan! Cari kata lainnya.`);
+                            
+                            // Check if all words found
+                            if (foundWords.length === wordsToFind.length) {
+                                setTimeout(() => {
+                                    showWordSearchInstruction('🎉 Selamat! Semua kata berhasil ditemukan!');
+                                }, 1000);
+                            }
+                        } else {
+                            showWordSearchInstruction('⚠️ Kata ini sudah ditemukan sebelumnya!');
+                        }
+                    } else {
+                        showWordSearchInstruction('❌ Kata tidak ditemukan dalam daftar. Coba lagi!');
+                        
+                        // Remove highlight from path
+                        pathCells.forEach(cell => {
+                            const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                            if (cellElement) {
+                                cellElement.classList.remove('bg-blue-300', 'bg-yellow-300');
+                                cellElement.style.border = '1px solid #ddd';
+                            }
+                        });
+                    }
+                } else {
+                    showWordSearchInstruction('❌ Tidak dapat membuat garis lurus antara kedua huruf!');
+                }
+                
+                // Reset selection
+                firstSelectedCell.element.classList.remove('bg-blue-300');
+                firstSelectedCell.element.style.border = '1px solid #ddd';
+                firstSelectedCell = null;
+                isSelectingWord = false;
+            }
+        }
+
+        function getPathBetweenCells(startCell, endCell) {
+            const startRow = startCell.row;
+            const startCol = startCell.col;
+            const endRow = endCell.row;
+            const endCol = endCell.col;
+            
+            const rowDiff = endRow - startRow;
+            const colDiff = endCol - startCol;
+            
+            // Check if it's a valid straight line (horizontal, vertical, or diagonal)
+            if (rowDiff !== 0 && colDiff !== 0 && Math.abs(rowDiff) !== Math.abs(colDiff)) {
+                return []; // Not a straight line
+            }
+            
+            const path = [];
+            const steps = Math.max(Math.abs(rowDiff), Math.abs(colDiff));
+            
+            if (steps === 0) {
+                // Same cell
+                return [{ row: startRow, col: startCol }];
+            }
+            
+            const rowStep = rowDiff === 0 ? 0 : rowDiff / steps;
+            const colStep = colDiff === 0 ? 0 : colDiff / steps;
+            
+            for (let i = 0; i <= steps; i++) {
+                const currentRow = startRow + Math.round(i * rowStep);
+                const currentCol = startCol + Math.round(i * colStep);
+                path.push({ row: currentRow, col: currentCol });
+                
+                // Highlight path temporarily
+                const cellElement = document.querySelector(`[data-row="${currentRow}"][data-col="${currentCol}"]`);
+                if (cellElement && i > 0 && i < steps) {
+                    cellElement.classList.add('bg-yellow-300');
+                }
+            }
+            
+            return path;
+        }
+
+        function showWordSearchInstruction(message) {
+            const existingInstruction = document.querySelector('#word-search-grid .instruction-message');
+            if (existingInstruction) {
+                existingInstruction.remove();
+            }
+            
+            const instruction = document.createElement('div');
+            instruction.className = 'instruction-message mt-3 p-3 bg-green-50 rounded-lg text-center text-green-800 font-bold';
+            instruction.textContent = message;
+            
+            document.getElementById('word-search-grid').appendChild(instruction);
+            
+            // Auto remove after 3 seconds for success/error messages
+            if (message.includes('✅') || message.includes('❌') || message.includes('⚠️')) {
+                setTimeout(() => {
+                    if (instruction.parentNode) {
+                        instruction.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Puzzle functions
+        function createPuzzle() {
+            const question = document.getElementById('puzzle-question').value.trim();
+            const pieces = [
+                document.getElementById('puzzle-piece1').value.trim(),
+                document.getElementById('puzzle-piece2').value.trim(),
+                document.getElementById('puzzle-piece3').value.trim(),
+                document.getElementById('puzzle-piece4').value.trim()
+            ];
+
+            if (question && pieces.every(piece => piece)) {
+                puzzlePieces = [...pieces];
+                displayPuzzle(question);
+                
+                // Show PIN button for teachers
+                if (isTeacher && puzzlePieces.length > 0) {
+                    document.getElementById('puzzle-pin-btn').style.display = 'inline-block';
+                }
+                
+                // Clear form
+                document.getElementById('puzzle-question').value = '';
+                document.getElementById('puzzle-piece1').value = '';
+                document.getElementById('puzzle-piece2').value = '';
+                document.getElementById('puzzle-piece3').value = '';
+                document.getElementById('puzzle-piece4').value = '';
+            }
+        }
+
+        function displayPuzzle(question) {
+            const puzzleArea = document.getElementById('puzzle-area');
+            const shuffledPieces = [...puzzlePieces].sort(() => Math.random() - 0.5);
+            
+            puzzleArea.innerHTML = `
+                <h3 class="text-xl font-bold mb-4">${question}</h3>
+                <div class="mb-6">
+                    <h4 class="font-bold mb-3">Susun puzzle ini dengan urutan yang benar:</h4>
+                    <div class="flex flex-wrap justify-center gap-4 mb-6">
+                        ${shuffledPieces.map((piece, index) => `
+                            <div class="puzzle-piece bg-blue-200 hover:bg-blue-300" 
+                                 draggable="true" 
+                                 ondragstart="dragStart(event, '${piece}')"
+                                 data-piece="${piece}">
+                                ${piece}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h4 class="font-bold mb-3">Letakkan di sini sesuai urutan:</h4>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        ${Array(4).fill().map((_, index) => `
+                            <div class="puzzle-slot" 
+                                 ondrop="drop(event, ${index})" 
+                                 ondragover="allowDrop(event)"
+                                 data-slot="${index}">
+                                ${index + 1}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <button onclick="checkPuzzle()" class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">Periksa Jawaban</button>
+            `;
+        }
+
+        function dragStart(event, piece) {
+            event.dataTransfer.setData("text/plain", piece);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drop(event, slotIndex) {
+            event.preventDefault();
+            const piece = event.dataTransfer.getData("text/plain");
+            const slot = event.target;
+            
+            if (slot.classList.contains('puzzle-slot') && !slot.classList.contains('filled')) {
+                slot.textContent = piece;
+                slot.classList.add('filled');
+                slot.dataset.piece = piece;
+                
+                // Hide the dragged piece
+                const pieceElement = document.querySelector(`[data-piece="${piece}"]`);
+                if (pieceElement && pieceElement.classList.contains('puzzle-piece')) {
+                    pieceElement.style.display = 'none';
+                }
+            }
+        }
+
+        function checkPuzzle() {
+            const slots = document.querySelectorAll('.puzzle-slot');
+            const userOrder = Array.from(slots).map(slot => slot.dataset.piece || '');
+            const correctOrder = puzzlePieces;
+            
+            let correct = true;
+            slots.forEach((slot, index) => {
+                if (userOrder[index] === correctOrder[index]) {
+                    slot.classList.add('bg-green-200');
+                    slot.classList.remove('bg-red-200');
+                } else {
+                    slot.classList.add('bg-red-200');
+                    slot.classList.remove('bg-green-200');
+                    correct = false;
+                }
+            });
+            
+            const result = document.createElement('div');
+            result.className = `mt-4 p-4 rounded-lg text-center font-bold ${correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            result.textContent = correct ? '🎉 Selamat! Puzzle berhasil disusun dengan benar!' : '❌ Belum benar, coba lagi!';
+            
+            const existingResult = document.querySelector('#puzzle-area .mt-4.p-4');
+            if (existingResult) existingResult.remove();
+            
+            document.getElementById('puzzle-area').appendChild(result);
+        }
+
+        // Time and Calendar Functions
+        let currentCalendarDate = new Date();
+        
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('current-time').textContent = timeString;
+            document.getElementById('current-date').textContent = dateString;
+        }
+        
+        function toggleCalendar() {
+            const modal = document.getElementById('calendar-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                generateCalendar();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            generateCalendar();
+        }
+        
+        function generateCalendar() {
+            const monthNames = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            const today = new Date();
+            
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day text-sm';
+                dayElement.textContent = currentDate.getDate();
+                
+                if (currentDate.getMonth() !== month) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                if (currentDate.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                grid.appendChild(dayElement);
+            }
+        }
+        
+        // Initialize time display
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Matching Game Functions
+        function addMatchingPair() {
+            const leftWord = document.getElementById('match-left').value.trim();
+            const rightWord = document.getElementById('match-right').value.trim();
+            
+            if (leftWord && rightWord) {
+                matchingPairs.push({ left: leftWord, right: rightWord });
+                
+                // Show PIN button for teachers
+                if (isTeacher && matchingPairs.length > 0) {
+                    document.getElementById('matching-pin-btn').style.display = 'inline-block';
+                }
+                
+                // Clear inputs
+                document.getElementById('match-left').value = '';
+                document.getElementById('match-right').value = '';
+                
+                showNotification(`✅ Pasangan "${leftWord} - ${rightWord}" ditambahkan!`, 'success');
+            } else {
+                showNotification('⚠️ Mohon isi kedua kata!', 'warning');
+            }
+        }
+        
+        function startMatchingGame() {
+            if (matchingPairs.length === 0) {
+                showNotification('⚠️ Tambahkan minimal satu pasangan kata!', 'warning');
+                return;
+            }
+            
+            const matchingArea = document.getElementById('matching-area');
+            
+            // Shuffle both left and right words separately
+            const leftWords = [...matchingPairs.map(pair => pair.left)].sort(() => Math.random() - 0.5);
+            const rightWords = [...matchingPairs.map(pair => pair.right)].sort(() => Math.random() - 0.5);
+            
+            matchingArea.innerHTML = `
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-4">🔗 Tarik garis untuk mencocokkan kata!</h3>
+                    <p class="text-gray-600 mb-6">Klik kata di sebelah kiri, lalu klik pasangannya di sebelah kanan</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto relative" id="matching-container">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-center text-blue-800">Kata Kiri</h4>
+                        ${leftWords.map((word, index) => `
+                            <div class="matching-item" data-word="${word}" data-side="left" data-index="${index}" onclick="selectMatchingItem(this)">
+                                ${word}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-center text-pink-800">Kata Kanan</h4>
+                        ${rightWords.map((word, index) => `
+                            <div class="matching-item" data-word="${word}" data-side="right" data-index="${index}" onclick="selectMatchingItem(this)">
+                                ${word}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button onclick="checkAllMatches()" class="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 font-bold">
+                        🎯 Periksa Semua Jawaban
+                    </button>
+                    <button onclick="resetMatchingGame()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-bold ml-4">
+                        🔄 Reset Game
+                    </button>
+                </div>
+                <div id="matching-result" class="mt-6"></div>
+            `;
+            
+            // Reset game state
+            selectedMatchingItem = null;
+            matchedPairs = [];
+        }
+        
+        function selectMatchingItem(element) {
+            // Don't allow selection of already matched items
+            if (element.classList.contains('matched')) return;
+            
+            // If no item selected yet
+            if (!selectedMatchingItem) {
+                selectedMatchingItem = element;
+                element.classList.add('selected');
+                return;
+            }
+            
+            // If clicking the same item, deselect it
+            if (selectedMatchingItem === element) {
+                selectedMatchingItem.classList.remove('selected');
+                selectedMatchingItem = null;
+                return;
+            }
+            
+            // If selecting from same side, switch selection
+            if (selectedMatchingItem.dataset.side === element.dataset.side) {
+                selectedMatchingItem.classList.remove('selected');
+                selectedMatchingItem = element;
+                element.classList.add('selected');
+                return;
+            }
+            
+            // Check if it's a correct match
+            const word1 = selectedMatchingItem.dataset.word;
+            const word2 = element.dataset.word;
+            
+            const isCorrectMatch = matchingPairs.some(pair => 
+                (pair.left === word1 && pair.right === word2) || 
+                (pair.left === word2 && pair.right === word1)
+            );
+            
+            if (isCorrectMatch) {
+                // Correct match
+                selectedMatchingItem.classList.remove('selected');
+                selectedMatchingItem.classList.add('matched');
+                element.classList.add('matched');
+                
+                matchedPairs.push({ word1, word2 });
+                
+                // Draw line between matched items
+                drawMatchingLine(selectedMatchingItem, element);
+                
+                showNotification(`✅ Benar! "${word1}" cocok dengan "${word2}"`, 'success');
+                
+                // Check if all pairs matched
+                if (matchedPairs.length === matchingPairs.length) {
+                    setTimeout(() => {
+                        showNotification('🎉 Selamat! Semua pasangan berhasil dijodohkan!', 'success');
+                        document.getElementById('matching-result').innerHTML = `
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center font-bold">
+                                🏆 SEMPURNA! Semua ${matchingPairs.length} pasangan berhasil dijodohkan!
+                            </div>
+                        `;
+                    }, 1000);
+                }
+            } else {
+                // Wrong match
+                selectedMatchingItem.classList.remove('selected');
+                selectedMatchingItem.classList.add('wrong');
+                element.classList.add('wrong');
+                
+                showNotification(`❌ Salah! "${word1}" tidak cocok dengan "${word2}"`, 'error');
+                
+                // Remove wrong styling after animation
+                setTimeout(() => {
+                    selectedMatchingItem.classList.remove('wrong');
+                    element.classList.remove('wrong');
+                }, 1000);
+            }
+            
+            selectedMatchingItem = null;
+        }
+        
+        function drawMatchingLine(element1, element2) {
+            const container = document.getElementById('matching-container');
+            const rect1 = element1.getBoundingClientRect();
+            const rect2 = element2.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const x1 = rect1.right - containerRect.left;
+            const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+            const x2 = rect2.left - containerRect.left;
+            const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+            
+            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            const line = document.createElement('div');
+            line.className = 'matching-line';
+            line.style.width = length + 'px';
+            line.style.left = x1 + 'px';
+            line.style.top = y1 + 'px';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.transformOrigin = '0 50%';
+            
+            container.appendChild(line);
+        }
+        
+        function checkAllMatches() {
+            const result = document.getElementById('matching-result');
+            const correctCount = matchedPairs.length;
+            const totalCount = matchingPairs.length;
+            
+            if (correctCount === totalCount) {
+                result.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center font-bold">
+                        🏆 SEMPURNA! Semua ${totalCount} pasangan berhasil dijodohkan!
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg text-center font-bold">
+                        📊 Skor: ${correctCount}/${totalCount} pasangan benar. ${totalCount - correctCount} pasangan lagi!
+                    </div>
+                `;
+            }
+        }
+        
+        function resetMatchingGame() {
+            // Clear all lines
+            const lines = document.querySelectorAll('.matching-line');
+            lines.forEach(line => line.remove());
+            
+            // Reset all items
+            const items = document.querySelectorAll('.matching-item');
+            items.forEach(item => {
+                item.classList.remove('selected', 'matched', 'wrong');
+            });
+            
+            // Reset game state
+            selectedMatchingItem = null;
+            matchedPairs = [];
+            
+            // Clear result
+            document.getElementById('matching-result').innerHTML = '';
+            
+            showNotification('🔄 Game direset! Silakan coba lagi.', 'info');
+        }
+
+        // Word Scramble Game Functions
+        function addScrambleWord() {
+            const word = document.getElementById('scramble-word').value.trim().toUpperCase();
+            const hint = document.getElementById('scramble-hint').value.trim();
+            
+            if (word) {
+                scrambleWords.push({ word, hint });
+                
+                // Show PIN button for teachers
+                if (isTeacher && scrambleWords.length > 0) {
+                    document.getElementById('word-scramble-pin-btn').style.display = 'inline-block';
+                }
+                
+                // Clear inputs
+                document.getElementById('scramble-word').value = '';
+                document.getElementById('scramble-hint').value = '';
+                
+                showNotification(`✅ Kata "${word}" ditambahkan!`, 'success');
+            } else {
+                showNotification('⚠️ Mohon masukkan kata!', 'warning');
+            }
+        }
+        
+        function startScrambleGame() {
+            if (scrambleWords.length === 0) {
+                showNotification('⚠️ Tambahkan minimal satu kata!', 'warning');
+                return;
+            }
+            
+            currentScrambleIndex = 0;
+            displayScrambleWord();
+        }
+        
+        function displayScrambleWord() {
+            if (currentScrambleIndex >= scrambleWords.length) {
+                // Game completed
+                document.getElementById('scramble-area').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center">
+                        <h3 class="text-2xl font-bold mb-2">🎉 Selamat!</h3>
+                        <p class="text-lg">Anda telah menyelesaikan semua ${scrambleWords.length} kata!</p>
+                        <button onclick="startScrambleGame()" class="mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-bold">
+                            🔄 Main Lagi
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const currentWord = scrambleWords[currentScrambleIndex];
+            const scrambledLetters = currentWord.word.split('').sort(() => Math.random() - 0.5);
+            currentScrambledLetters = [...scrambledLetters];
+            currentAnswerSlots = new Array(currentWord.word.length).fill('');
+            
+            const scrambleArea = document.getElementById('scramble-area');
+            scrambleArea.innerHTML = `
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-2">Kata ${currentScrambleIndex + 1} dari ${scrambleWords.length}</h3>
+                    ${currentWord.hint ? `<p class="text-gray-600 mb-4">💡 Petunjuk: ${currentWord.hint}</p>` : ''}
+                </div>
+                
+                <div class="mb-8">
+                    <h4 class="font-bold mb-4">🔤 Huruf yang tersedia:</h4>
+                    <div class="flex flex-wrap justify-center gap-3 mb-6" id="scramble-letters">
+                        ${scrambledLetters.map((letter, index) => `
+                            <div class="scramble-letter" data-letter="${letter}" data-index="${index}" onclick="selectScrambleLetter(this)">
+                                ${letter}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h4 class="font-bold mb-4">📝 Susun kata di sini:</h4>
+                    <div class="flex justify-center gap-2 mb-6" id="answer-slots">
+                        ${currentAnswerSlots.map((slot, index) => `
+                            <div class="answer-slot" data-slot-index="${index}" onclick="clearAnswerSlot(${index})">
+                                ${slot}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="flex justify-center gap-4">
+                    <button onclick="checkScrambleAnswer()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-bold">
+                        ✅ Periksa Jawaban
+                    </button>
+                    <button onclick="clearAllAnswerSlots()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-bold">
+                        🗑️ Hapus Semua
+                    </button>
+                    <button onclick="showScrambleHint()" class="bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 font-bold">
+                        💡 Bantuan
+                    </button>
+                </div>
+                
+                <div id="scramble-result" class="mt-6"></div>
+            `;
+        }
+        
+        function selectScrambleLetter(element) {
+            if (element.classList.contains('selected')) return;
+            
+            const letter = element.dataset.letter;
+            const letterIndex = parseInt(element.dataset.index);
+            
+            // Find first empty slot
+            const emptySlotIndex = currentAnswerSlots.findIndex(slot => slot === '');
+            
+            if (emptySlotIndex !== -1) {
+                // Place letter in slot
+                currentAnswerSlots[emptySlotIndex] = letter;
+                
+                // Update display
+                const answerSlot = document.querySelector(`[data-slot-index="${emptySlotIndex}"]`);
+                answerSlot.textContent = letter;
+                answerSlot.classList.add('filled');
+                answerSlot.dataset.letterIndex = letterIndex;
+                
+                // Hide the selected letter
+                element.classList.add('selected');
+                element.style.opacity = '0.3';
+                element.style.pointerEvents = 'none';
+            }
+        }
+        
+        function clearAnswerSlot(slotIndex) {
+            if (currentAnswerSlots[slotIndex] === '') return;
+            
+            const answerSlot = document.querySelector(`[data-slot-index="${slotIndex}"]`);
+            const letterIndex = answerSlot.dataset.letterIndex;
+            
+            // Clear the slot
+            currentAnswerSlots[slotIndex] = '';
+            answerSlot.textContent = '';
+            answerSlot.classList.remove('filled');
+            answerSlot.removeAttribute('data-letter-index');
+            
+            // Show the letter again
+            const letterElement = document.querySelector(`[data-index="${letterIndex}"]`);
+            if (letterElement) {
+                letterElement.classList.remove('selected');
+                letterElement.style.opacity = '1';
+                letterElement.style.pointerEvents = 'auto';
+            }
+        }
+        
+        function clearAllAnswerSlots() {
+            for (let i = 0; i < currentAnswerSlots.length; i++) {
+                clearAnswerSlot(i);
+            }
+            showNotification('🗑️ Semua huruf dikembalikan!', 'info');
+        }
+        
+        function checkScrambleAnswer() {
+            const currentWord = scrambleWords[currentScrambleIndex];
+            const userAnswer = currentAnswerSlots.join('');
+            const resultDiv = document.getElementById('scramble-result');
+            
+            if (userAnswer.length !== currentWord.word.length) {
+                showNotification('⚠️ Lengkapi semua huruf terlebih dahulu!', 'warning');
+                return;
+            }
+            
+            if (userAnswer === currentWord.word) {
+                // Correct answer
+                const answerSlots = document.querySelectorAll('.answer-slot');
+                answerSlots.forEach(slot => slot.classList.add('correct'));
+                
+                resultDiv.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center font-bold">
+                        🎉 Benar! Kata "${currentWord.word}" berhasil disusun!
+                    </div>
+                `;
+                
+                showNotification(`✅ Benar! Kata "${currentWord.word}"`, 'success');
+                
+                // Move to next word after delay
+                setTimeout(() => {
+                    currentScrambleIndex++;
+                    displayScrambleWord();
+                }, 2000);
+                
+            } else {
+                // Wrong answer
+                const answerSlots = document.querySelectorAll('.answer-slot');
+                answerSlots.forEach(slot => {
+                    slot.classList.add('wrong');
+                    setTimeout(() => slot.classList.remove('wrong'), 1000);
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center font-bold">
+                        ❌ Salah! Coba susun ulang huruf-hurufnya.
+                    </div>
+                `;
+                
+                showNotification('❌ Jawaban salah, coba lagi!', 'error');
+                
+                // Clear result after delay
+                setTimeout(() => {
+                    resultDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+        
+        function showScrambleHint() {
+            const currentWord = scrambleWords[currentScrambleIndex];
+            const resultDiv = document.getElementById('scramble-result');
+            
+            // Show first letter as hint
+            const firstLetter = currentWord.word[0];
+            
+            resultDiv.innerHTML = `
+                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg text-center font-bold">
+                    💡 Bantuan: Huruf pertama adalah "${firstLetter}"
+                </div>
+            `;
+            
+            showNotification(`💡 Huruf pertama: ${firstLetter}`, 'info');
+            
+            // Clear hint after delay
+            setTimeout(() => {
+                resultDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Don't initialize any game until user logs in
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96dca94d462edf9f',t:'MTc1NDk2Njk4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
